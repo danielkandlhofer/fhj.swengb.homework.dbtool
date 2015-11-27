@@ -5,6 +5,7 @@ import java.sql.{Connection, DriverManager, ResultSet, Statement}
 import fhj.swengb.Person._
 import fhj.swengb.{Person, Students}
 
+import scala.collection.mutable.ListBuffer
 import scala.util.Try
 
 /**
@@ -81,20 +82,82 @@ object Db {
     Try(DriverManager.getConnection("jdbc:sqlite::memory:"))
 
 }
+object Product extends Db.DbEntity[Product] {
 
-case class Employee(firstName: String) extends Db.DbEntity[Employee] {
+  val dropTableSql = "drop table if exists product"
+  val createTableSql = "create table product (id integer, bezeichnung string, price double)"
+  val insertSql = "insert into product(id, bezeichnung, price) VALUES (? ? ?)"
 
-  def reTable(stmt: Statement): Int = 0
 
-  def toDb(c: Connection)(t: Employee): Int = 0
+  def reTable(stmt: Statement): Int = {
+    stmt.executeUpdate(Product.dropTableSql)
+    stmt.executeUpdate(Product.createTableSql)
+  }
 
-  def fromDb(rs: ResultSet): List[Employee] = List()
+  def toDb(c: Connection)(p: Product): Int = {
+    val pstmt = c.prepareStatement(insertSql)
+    pstmt.setInt(1, p.id)
+    pstmt.setString(2, p.name)
+    pstmt.setDouble(3, p.price)
+    pstmt.executeUpdate()
+  }
 
-  def dropTableSql: String = ""
+  def fromDb(rs: ResultSet): List[Product] = {
+    val lb: ListBuffer[Product] = new ListBuffer[Product]()
+    while (rs.next()) lb.append(Product(rs.getInt("id"),
+      rs.getString("name"),
+      rs.getDouble("price"),
+    lb.toList
+  }
 
-  def createTableSql: String = ""
+  def queryAll(con: Connection): ResultSet =
+    query(con)("select * from product")
 
-  def insertSql: String = ""
+}
+
+case class Product(id: Int, name: String, price: Double) extends Db.DbEntity[Product] {
+  /**
+    * Recreates the table this entity is stored in
+    *
+    * @param stmt
+    * @return
+    */
+   def reTable(stmt: Statement): Int = ???
+
+  /**
+    * sql code for creating the entity backing table
+    */
+   def createTableSql: String = ???
+
+  /**
+    * Sql code necessary to execute a drop table on the backing sql table
+    *
+    * @return
+    */
+   def dropTableSql: String = ???
+
+  /**
+    * Saves given type to the database.
+    *
+    * @param c
+    * @param t
+    * @return
+    */
+   def toDb(c: Connection)(t: Product): Int = ???
+
+  /**
+    * Given the resultset, it fetches its rows and converts them into instances of T
+    *
+    * @param rs
+    * @return
+    */
+   def fromDb(rs: ResultSet): List[Product] = ???
+
+  /**
+    * sql code for inserting an entity.
+    */
+    def insertSql(): String = ???
+
 
 }
 
