@@ -106,8 +106,8 @@ object Product extends Db.DbEntity[Product] {
     val lb: ListBuffer[Product] = new ListBuffer[Product]()
     while (rs.next()) lb.append(Product(rs.getInt("id"),
       rs.getString("name"),
-      rs.getDouble("price"),
-    lb.toList
+      rs.getDouble("price")))
+    return lb.toList
   }
 
   def queryAll(con: Connection): ResultSet =
@@ -116,49 +116,13 @@ object Product extends Db.DbEntity[Product] {
 }
 
 case class Product(id: Int, name: String, price: Double) extends Db.DbEntity[Product] {
-  /**
-    * Recreates the table this entity is stored in
-    *
-    * @param stmt
-    * @return
-    */
+
    def reTable(stmt: Statement): Int = ???
-
-  /**
-    * sql code for creating the entity backing table
-    */
    def createTableSql: String = ???
-
-  /**
-    * Sql code necessary to execute a drop table on the backing sql table
-    *
-    * @return
-    */
    def dropTableSql: String = ???
-
-  /**
-    * Saves given type to the database.
-    *
-    * @param c
-    * @param t
-    * @return
-    */
    def toDb(c: Connection)(t: Product): Int = ???
-
-  /**
-    * Given the resultset, it fetches its rows and converts them into instances of T
-    *
-    * @param rs
-    * @return
-    */
    def fromDb(rs: ResultSet): List[Product] = ???
-
-  /**
-    * sql code for inserting an entity.
-    */
-    def insertSql(): String = ???
-
-
+   def insertSql(): String = ???
 }
 
 
@@ -166,9 +130,9 @@ object DbTool {
 
   def main(args: Array[String]) {
     for {con <- Db.maybeConnection
-         _ = Person.reTable(con.createStatement())
-         _ = Students.sortedStudents.map(toDb(con)(_))
-         s <- Person.fromDb(queryAll(con))} {
+         _ = Product.reTable(con.createStatement())
+         //_ = Students.sortedStudents.map(toDb(con)(_))
+         s <- Product.fromDb(Product.queryAll(con))} {
       println(s)
     }
   }
