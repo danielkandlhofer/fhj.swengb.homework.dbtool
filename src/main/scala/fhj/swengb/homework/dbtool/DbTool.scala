@@ -2,10 +2,8 @@ package fhj.swengb.homework.dbtool
 
 import java.sql.{Connection, DriverManager, ResultSet, Statement}
 
-import fhj.swengb.Person._
-import fhj.swengb.{Person, Students}
-
-import scala.collection.mutable.ListBuffer
+import fhj.swengb.homework.dbtool.Product._
+import fhj.swengb.homework.dbtool.Customer._
 import scala.util.Try
 
 /**
@@ -82,94 +80,48 @@ object Db {
     Try(DriverManager.getConnection("jdbc:sqlite::memory:"))
 
 }
-object Product extends Db.DbEntity[Product] {
-
-  val dropTableSql = "drop table if exists product"
-  val createTableSql = "create table product (id integer, bezeichnung string, price double)"
-  val insertSql = "insert into product(id, bezeichnung, price) VALUES (? ? ?)"
-
-
-  def reTable(stmt: Statement): Int = {
-    stmt.executeUpdate(Product.dropTableSql)
-    stmt.executeUpdate(Product.createTableSql)
-  }
-
-  def toDb(c: Connection)(p: Product): Int = {
-    val pstmt = c.prepareStatement(insertSql)
-    pstmt.setInt(1, p.id)
-    pstmt.setString(2, p.name)
-    pstmt.setDouble(3, p.price)
-    pstmt.executeUpdate()
-  }
-
-  def fromDb(rs: ResultSet): List[Product] = {
-    val lb: ListBuffer[Product] = new ListBuffer[Product]()
-    while (rs.next()) lb.append(Product(rs.getInt("id"),
-      rs.getString("name"),
-      rs.getDouble("price"),
-    lb.toList
-  }
-
-  def queryAll(con: Connection): ResultSet =
-    query(con)("select * from product")
-
-}
-
-case class Product(id: Int, name: String, price: Double) extends Db.DbEntity[Product] {
-  /**
-    * Recreates the table this entity is stored in
-    *
-    * @param stmt
-    * @return
-    */
-   def reTable(stmt: Statement): Int = ???
-
-  /**
-    * sql code for creating the entity backing table
-    */
-   def createTableSql: String = ???
-
-  /**
-    * Sql code necessary to execute a drop table on the backing sql table
-    *
-    * @return
-    */
-   def dropTableSql: String = ???
-
-  /**
-    * Saves given type to the database.
-    *
-    * @param c
-    * @param t
-    * @return
-    */
-   def toDb(c: Connection)(t: Product): Int = ???
-
-  /**
-    * Given the resultset, it fetches its rows and converts them into instances of T
-    *
-    * @param rs
-    * @return
-    */
-   def fromDb(rs: ResultSet): List[Product] = ???
-
-  /**
-    * sql code for inserting an entity.
-    */
-    def insertSql(): String = ???
-
-
-}
-
 
 object DbTool {
 
+  val c1:Customer = Customer(1000,"Lala Hans", "Hallogasse 1337, 8010 Graz")
+  val c2:Customer = Customer(1001,"Hans Hans", "Dawohnichstrasse 0, 8020 Graz")
+  val c3:Customer = Customer(1002,"Hans Franz", "Gasse 1, 8010 Graz")
+  val c4:Customer = Customer(1003,"Test Hans", "Strasse 1000, 8010 Graz")
+  val c5:Customer = Customer(1004,"Test Franz", "Hansgasse 10, 1010 Wien")
+
+  val customers:Set[Customer] = Set(c1,c2,c3,c4,c5)
+
+  val p1:Product = Product(1,"Produkt1",1.0)
+  val p2:Product = Product(2,"Produkt2",2.0)
+  val p3:Product = Product(3,"Produkt3",3.0)
+  val p4:Product = Product(4,"Produkt4",4.0)
+  val p5:Product = Product(5,"Produkt5",5.0)
+  val p6:Product = Product(6,"Produkt6",6.0)
+  val p7:Product = Product(7,"Produkt7",7.0)
+  val p8:Product = Product(8,"Produkt8",8.0)
+  val p9:Product = Product(9,"Produkt9",9.0)
+
+  val products:Set[Product] = Set(p1,p2,p3,p4,p5,p6,p7,p8,p9)
+
+
+
   def main(args: Array[String]) {
     for {con <- Db.maybeConnection
-         _ = Person.reTable(con.createStatement())
-         _ = Students.sortedStudents.map(toDb(con)(_))
-         s <- Person.fromDb(queryAll(con))} {
+         _ = Product.reTable(con.createStatement())
+         _ = products.map(Product.toDb(con)(_))
+         s <- Product.fromDb(Product.queryAll(con))} {
       println(s)
+    }
+    for {con <- Db.maybeConnection
+        _ = Product.toDb(con)(Product(10,"Produkt10",10.0))
+        x <- Product.fromDb(Product.queryAll(con))} {
+      println(x)
+    }
+    for {con <- Db.maybeConnection
+         _ = Customer.reTable(con.createStatement())
+         _ = customers.map(Customer.toDb(con)(_))
+         y <- Customer.fromDb(Customer.queryAll(con))} {
+      println(y)
     }
   }
 
