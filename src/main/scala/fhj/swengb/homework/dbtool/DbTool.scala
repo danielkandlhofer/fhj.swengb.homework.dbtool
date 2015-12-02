@@ -2,8 +2,7 @@ package fhj.swengb.homework.dbtool
 
 import java.sql.{Connection, DriverManager, ResultSet, Statement}
 
-import fhj.swengb.Person._
-import fhj.swengb.{Person, Students}
+import fhj.swengb.Product._
 
 import scala.util.Try
 
@@ -82,30 +81,85 @@ object Db {
 
 }
 
-case class Employee(firstName: String) extends Db.DbEntity[Employee] {
+case class Products(id: Int, name: String, price: Double) extends Db.DbEntity[Products] {
 
-  def reTable(stmt: Statement): Int = 0
+  /**
+    * Recreates the table this entity is stored in
+    *
+    * @param stmt
+    * @return
+    */
+  def reTable(stmt: Statement): Int
 
-  def toDb(c: Connection)(t: Employee): Int = 0
+  /**
+    * Saves given type to the database.
+    *
+    * @param c
+    * @param p
+    * @return
+    */
+  def toDb(c: Connection)(p: Products): Int
 
-  def fromDb(rs: ResultSet): List[Employee] = List()
+  /**
+    * Given the resultset, it fetches its rows and converts them into instances of T
+    *
+    * @param rs
+    * @return
+    */
+  def fromDb(rs: ResultSet): List[Products]
 
-  def dropTableSql: String = ""
+  /**
+    * Queries the database
+    *
+    * @param con
+    * @param query
+    * @return
+    */
+  def query(con: Connection)(query: String): ResultSet = {
+    con.createStatement().executeQuery(query)
+  }
 
-  def createTableSql: String = ""
+  /**
+    * Sql code necessary to execute a drop table on the backing sql table
+    *
+    * @return
+    */
+  def dropTableSql: String
 
-  def insertSql: String = ""
+  /**
+    * sql code for creating the entity backing table
+    */
+  def createTableSql: String
+
+  /**
+    * sql code for inserting an entity.
+    */
+  def insertSql: String
 
 }
 
+
+def reTable(stmt: Statement): Int = 0
+
+  def toDb(c: Connection)(t: Products): Int = 0
+
+  def fromDb(rs: ResultSet): List[Products] = List()
+
+  def dropTableSql: String = "drop table Products"
+
+  def createTableSql: String = "create table Products (...)"
+
+  def insertSql: String = "insert ..."
+
+}
 
 object DbTool {
 
   def main(args: Array[String]) {
     for {con <- Db.maybeConnection
-         _ = Person.reTable(con.createStatement())
-         _ = Students.sortedStudents.map(toDb(con)(_))
-         s <- Person.fromDb(queryAll(con))} {
+         _ = Products.reTable(con.createStatement())
+         _ = Products.sortedStudents.map(toDb(con)(_))
+         s <- Products.fromDb(queryAll(con))} {
       println(s)
     }
   }
