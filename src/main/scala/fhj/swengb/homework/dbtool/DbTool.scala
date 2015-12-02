@@ -90,20 +90,37 @@ case class Employee(firstName: String) extends Db.DbEntity[Employee] {
 
   def fromDb(rs: ResultSet): List[Employee] = List()
 
-  def dropTableSql: String = ""
+  def dropTableSql: String = "drop table product"
 
-  def createTableSql: String = ""
+  def createTableSql: String = "create table products"
 
-  def insertSql: String = ""
+  def insertSql: String = "insert table products"
 
 }
 
+/*
+case class Product(ID: Int, productName: String, productDescription :String, productPrice : Double) extends Db.DbEntity[Product] {
+
+  def reTable(stmt: Statement): Int = 0
+
+  def toDb(c: Connection)(t: Product): Int = 0
+
+  def fromDb(rs: ResultSet): List[Product] = List()
+
+  def dropTableSql: String = "drop table product"
+
+  def createTableSql: String = "create table product"
+
+  def insertSql: String = "insert table product"
+
+}
+*/
 
 object DbTool {
 
   def main(args: Array[String]) {
     for {con <- Db.maybeConnection
-         _ = Person.reTable(con.createStatement())
+         _ = Product.reTable(con.createStatement())
          _ = Students.sortedStudents.map(toDb(con)(_))
          s <- Person.fromDb(queryAll(con))} {
       println(s)
