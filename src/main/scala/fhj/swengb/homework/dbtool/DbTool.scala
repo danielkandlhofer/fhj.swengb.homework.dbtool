@@ -2,9 +2,8 @@ package fhj.swengb.homework.dbtool
 
 import java.sql.{Connection, DriverManager, ResultSet, Statement}
 
-import fhj.swengb.Person._
-import fhj.swengb.{Person, Students}
-
+import fhj.swengb.homework.dbtool.Product._
+import fhj.swengb.homework.dbtool.Customer._
 import scala.util.Try
 
 /**
@@ -82,48 +81,45 @@ object Db {
 
 }
 
-case class Employee(firstName: String) extends Db.DbEntity[Employee] {
-
-  def reTable(stmt: Statement): Int = 0
-
-  def toDb(c: Connection)(t: Employee): Int = 0
-
-  def fromDb(rs: ResultSet): List[Employee] = List()
-
-  def dropTableSql: String = "drop table product"
-
-  def createTableSql: String = "create table products"
-
-  def insertSql: String = "insert table products"
-
-}
-
-/*
-case class Product(ID: Int, productName: String, productDescription :String, productPrice : Double) extends Db.DbEntity[Product] {
-
-  def reTable(stmt: Statement): Int = 0
-
-  def toDb(c: Connection)(t: Product): Int = 0
-
-  def fromDb(rs: ResultSet): List[Product] = List()
-
-  def dropTableSql: String = "drop table product"
-
-  def createTableSql: String = "create table product"
-
-  def insertSql: String = "insert table product"
-
-}
-*/
-
 object DbTool {
+
+  val c1:Customer = Customer(1000,"Lala Hans", "Hallogasse 1337, 8010 Graz")
+  val c2:Customer = Customer(1001,"Hans Hans", "Dawohnichstrasse 0, 8020 Graz")
+  val c3:Customer = Customer(1002,"Hans Franz", "Gasse 1, 8010 Graz")
+  val c4:Customer = Customer(1003,"Test Hans", "Strasse 1000, 8010 Graz")
+  val c5:Customer = Customer(1004,"Test Franz", "Hansgasse 10, 1010 Wien")
+
+  val customers:Set[Customer] = Set(c1,c2,c3,c4,c5)
+
+  val p1:Product = Product(1,"Produkt1",1.0)
+  val p2:Product = Product(2,"Produkt2",2.0)
+  val p3:Product = Product(3,"Produkt3",3.0)
+  val p4:Product = Product(4,"Produkt4",4.0)
+  val p5:Product = Product(5,"Produkt5",5.0)
+  val p6:Product = Product(6,"Produkt6",6.0)
+  val p7:Product = Product(7,"Produkt7",7.0)
+  val p8:Product = Product(8,"Produkt8",8.0)
+  val p9:Product = Product(9,"Produkt9",9.0)
+
+  val products:Set[Product] = Set(p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
   def main(args: Array[String]) {
     for {con <- Db.maybeConnection
          _ = Product.reTable(con.createStatement())
-         _ = Students.sortedStudents.map(toDb(con)(_))
-         s <- Person.fromDb(queryAll(con))} {
+         _ = products.map(Product.toDb(con)(_))
+         s <- Product.fromDb(Product.queryAll(con))} {
       println(s)
+    }
+    for {con <- Db.maybeConnection
+        _ = Product.toDb(con)(Product(10,"Produkt10",10.0))
+        x <- Product.fromDb(Product.queryAll(con))} {
+      println(x)
+    }
+    for {con <- Db.maybeConnection
+         _ = Customer.reTable(con.createStatement())
+         _ = customers.map(Customer.toDb(con)(_))
+         y <- Customer.fromDb(Customer.queryAll(con))} {
+      println(y)
     }
   }
 
