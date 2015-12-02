@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<AnchorPane fx:id="anchorpane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="864.0" prefWidth="1267.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="tableview" layoutX="14.0" layoutY="43.0" prefHeight="629.0" prefWidth="800.0">
+        <columns>
+          <TableColumn fx:id="c1" prefWidth="50" text="C1" />
+          <TableColumn fx:id="c2" prefWidth="250" text="C2" />
+            <TableColumn fx:id="c3" prefWidth="250" text="C3" />
+            <TableColumn fx:id="c4" prefWidth="250" text="C4" />
+        </columns>
+      </TableView>
+      <Button layoutX="14.0" layoutY="687.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="190.0" text="Select Product" />
+      <Button layoutX="14.0" layoutY="718.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="190.0" text="Select Customers" />
+      <Button layoutX="14.0" layoutY="749.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="190.0" text="Select Orders" />
+      <Button layoutX="14.0" layoutY="780.0" mnemonicParsing="false" prefHeight="31.0" prefWidth="190.0" text="Select Order Positions" />
+   </children>
+</AnchorPane>
