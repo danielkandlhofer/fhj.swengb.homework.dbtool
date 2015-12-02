@@ -103,6 +103,8 @@ object DbTool {
 
   val products:Set[Product] = Set(p1,p2,p3,p4,p5,p6,p7,p8,p9)
 
+
+
   def main(args: Array[String]) {
     for {con <- Db.maybeConnection
          _ = Product.reTable(con.createStatement())
