@@ -3,6 +3,7 @@ package fhj.swengb.homework.dbtool
 import java.net.URL
 import java.util.ResourceBundle
 import javafx.application.Application
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.{FXCollections, ObservableList}
 import javafx.fxml.{Initializable, FXML, FXMLLoader}
 import javafx.scene.control.TableColumn
@@ -11,11 +12,6 @@ import javafx.scene.layout.AnchorPane
 import javafx.scene.{Scene, Parent}
 import javafx.stage.Stage
 import javafx.scene.control.TableView
-
-import fhj.swengb.Person
-import sun.plugin.javascript.navig.Anchor
-
-import scala.collection.concurrent.RDCSS_Descriptor
 import scala.util.control.NonFatal
 
 /**
@@ -60,7 +56,7 @@ class DbToolController extends Initializable {
 
   // Example for the Product Entity
   @FXML var tableview: TableView[Product] = _
-  @FXML var c1: TableColumn[Product,Integer] = _
+  @FXML var c1: TableColumn[Product,Int] = _
   @FXML var c2: TableColumn[Product,String] = _
   @FXML var c3: TableColumn[Product,Double] = _
 
@@ -68,19 +64,27 @@ class DbToolController extends Initializable {
 
   //create data for inserting in an observerList
   val data: ObservableList[Product] = FXCollections.observableArrayList(
-    new Product(55,"hallo",33.0)
+    new Product(55,"hallo",33.0),
+    new Product(20,"hello",30.22),
+    new Product(1,"lala",100.0),
+    new Product(88,"Hitler-Karneval-Kostuem",88.88)
   )
 
 
 
   override def initialize(location: URL, resources: ResourceBundle): Unit = {
-    //Für die columns namen setzen
-    c1.setCellValueFactory(new PropertyValueFactory[Product,Integer]("id"))
+    //Set the columns
+    c1.setCellValueFactory(new PropertyValueFactory[Product,Int]("id"))
     c2.setCellValueFactory(new PropertyValueFactory[Product,String]("name"))
     c3.setCellValueFactory(new PropertyValueFactory[Product,Double]("price"))
 
+    tableview.getColumns().setAll(c1,c2,c3)
+    tableview.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY)
     //inserting data from the observableArrayList
     tableview.setItems(data)
+    tableview.refresh()
+
+
   }
 
 
