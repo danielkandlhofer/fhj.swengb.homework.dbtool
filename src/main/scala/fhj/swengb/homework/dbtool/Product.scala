@@ -1,25 +1,18 @@
-/**
-  * Created by Daniel on 27.11.2015.
-  */
-package fhj.swengb
+package fhj.swengb.homework.dbtool
 
-import java.net.URL
-import java.sql.{Connection, ResultSet, Statement}
-/*
-import fhj.swengb.homework.dbtool.DbEntity
-import fhj.swengb.Db.DbEntity
-import fhj.swengb.GitHub
-import fhj.swengb.GitHub.User
-import fhj.swengb.Person._
-*/
+import java.sql.{ResultSet, Connection, Statement}
+
 import scala.collection.mutable.ListBuffer
 
+/**
+  * Created by loete on 27.11.2015.
+  */
 
 object Product extends Db.DbEntity[Product] {
 
   val dropTableSql = "drop table if exists product"
-  val createTableSql = "create table product (id string, name string, price integer)"
-  val insertSql = "insert into product (id, name, price) VALUES (?, ?, ?, ?)"
+  val createTableSql = "create table product (id integer, name string, price double)"
+  val insertSql = "insert into product (id, name, price) VALUES (?, ?, ?)"
 
 
   def reTable(stmt: Statement): Int = {
@@ -37,51 +30,26 @@ object Product extends Db.DbEntity[Product] {
 
   def fromDb(rs: ResultSet): List[Product] = {
     val lb: ListBuffer[Product] = new ListBuffer[Product]()
-    while (rs.next()) lb.append(Product(rs.getInt("id"),
-      rs.getString("name"),
-      rs.getDouble("price"),
+    while (rs.next()) lb.append(Product(rs.getInt("id"), rs.getString("name"), rs.getDouble("price")))
     lb.toList
   }
 
-  def queryAll(con: Connection): ResultSet =
-    query(con)("select * from product")
+  def queryAll(con: Connection): ResultSet = query(con)("select * from product")
+
 }
 
-/**
-  * Created by lad on 24.09.15.
-  */
-sealed trait Product {
+case class Product(id:Int, name: String, price:Double) extends Db.DbEntity[Product] {
 
-  def id: Int
+  def reTable(stmt: Statement): Int = 0
 
-  def name: String
+  def toDb(c: Connection)(t: Product): Int = 0
 
-  def price: Double
+  def fromDb(rs: ResultSet): List[Product] = List()
 
-  def longName = s"$name"
+  def dropTableSql: String = "drop table if exists product"
 
-  def normalize(in: String): String = {
-    val mapping =
-      Map("ä" -> "ae",
-        "ö" -> "oe",
-        "ü" -> "ue",
-        "ß" -> "ss")
-    mapping.foldLeft(in) { case ((s, (a, b))) => s.replace(a, b) }
-  }
+  def createTableSql: String = "create table product (id integer, name String, price Double"
 
-  /*
-  def normalize2(input: String): String = {
-    val output = Normalizer.normalize(input, Normalizer.Form.NFD)
-    val pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
-    pattern.matcher(output).replaceAll("")
-  } */
+  def insertSql: String = "insert into person (id, name, price) VALUES (?, ?, ?)"
 
-
-  def userId: String = {
-    val fst = name(0).toLower.toString
-    normalize(fst.toLowerCase)
-  }
-
-
-
-
+}
